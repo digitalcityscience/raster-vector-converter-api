@@ -33,13 +33,13 @@ def check_input(
     property_to_burn
 ):
     if not isinstance(resolution, int):
-        raise HTTPException(status_code=401, detail=f"Invalid resolution: {resolution}")
+        raise HTTPException(status_code=400, detail=f"Invalid resolution: {resolution}")
     
     if not isinstance(property_to_burn, str):
-        raise HTTPException(status_code=401, detail=f"Invalid property to burn: {property_to_burn}")
+        raise HTTPException(status_code=400, detail=f"Invalid property to burn: {property_to_burn}")
 
     if not isinstance(geojson, GeoJSON):
-        raise HTTPException(status_code=401, detail=f"Invalid geojson given. Provide valid features and crs")
+        raise HTTPException(status_code=400, detail=f"Invalid geojson given. Provide valid features and crs")
 
 
 
