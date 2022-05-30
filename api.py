@@ -18,42 +18,33 @@ class PngResponse(TypedDict):
 
 class GeoJSONFeature(TypedDict):
     type: str
-    coordinates: list
+    geometry: dict
     properties: dict
 
 class GeoJSON(TypedDict):
-    features: list(GeoJSONFeature)
+    features: list[GeoJSONFeature]
     crs: dict
 
 
-# checks input for validity
-def check_input(
-    geojson,
-    resolution,
-    property_to_burn
-):
-    if not isinstance(resolution, int):
-        raise HTTPException(status_code=400, detail=f"Invalid resolution: {resolution}")
-    
-    if not isinstance(property_to_burn, str):
-        raise HTTPException(status_code=400, detail=f"Invalid property to burn: {property_to_burn}")
 
-    if not isinstance(geojson, GeoJSON):
-        raise HTTPException(status_code=400, detail=f"Invalid geojson given. Provide valid features and crs")
+class RequestObject(TypedDict):
+    geojson: GeoJSON
+    resolution: int
+    property_to_burn: str
 
 
+@app.post("/geojson_to_png")
+# TODO async def geojson_to_png(
+def geojson_to_png(
+    request_obj: RequestObject
+) -> PngResponse:
 
-@app.get("/geojson_to_png")
-async def geojson_to_png(
-    geojson: GeoJSON,
-    resolution: int,
-    property_to_burn: str,
-) -> PngResponse: 
-
-    check_input(geojson, resolution, property_to_burn)
+    geojson =  request_obj["geojson"]  # TODO GeoJSON
+    resolution= request_obj["resolution"]
+    property_to_burn = request_obj["property_to_burn"]
 
     gdf = make_gdf_from_geojson(geojson)
-    gdf = gdf.set_csr("EPSG:25832")
+    gdf = gdf.to_crs("EPSG:25832")
 
     # rasterize data to np.ndarray
     raster = rasterize_gdf(gdf, property_to_burn, resolution)
@@ -68,6 +59,7 @@ async def geojson_to_png(
     }
 
     return response_object
+
 
 
 """ 

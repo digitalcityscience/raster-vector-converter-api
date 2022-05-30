@@ -39,7 +39,8 @@ def rasterize_gdf(
 
     # create a np array with dtype uint8 from rasterized data
     img = raster_data.astype(np.uint8)
-    print("unique values in image data ", np.unique(img))
+    # for debugging: 
+    # print("unique values in image data ", np.unique(img))
 
     return img
 
@@ -59,7 +60,7 @@ def make_gdf_from_geojson(geojson) -> geopandas.GeoDataFrame:
 # gets [x,y] of the south west corner of the bbox.
 # might only work for european quadrant of the world
 def get_south_west_corner_coords_gdf(gdf_bounds) -> list:
-    left, bottom, = gdf_bounds
+    left, bottom, _, _ = gdf_bounds
     
     sw_point = Point([left, bottom])
 
