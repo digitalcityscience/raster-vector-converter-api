@@ -5,8 +5,9 @@ import rasterio.features
 import geopandas
 
 # converts tif to geojson and returns feature array
-def convert_tif_to_gdf(tif_path) -> geopandas.GeoDataFrame:
+def convert_raster_to_gdf(tif_path, crs) -> geopandas.GeoDataFrame:
     features = []
+    
     dataset = rasterio.open(tif_path)
     # Read the dataset's valid data mask as a ndarray.
     mask = dataset.read(1)
@@ -29,7 +30,7 @@ def convert_tif_to_gdf(tif_path) -> geopandas.GeoDataFrame:
         features.append(feature)
 
     # create gdf from feature array
-    gdf = geopandas.GeoDataFrame.from_features(features, crs="urn:ogc:def:crs:EPSG::25832",
+    gdf = geopandas.GeoDataFrame.from_features(features, crs=crs,
                                                columns=["geometry", "value"])
     # geopandas also automatically merges all polygons with same values
     gdf = gdf.dissolve(by="value")
@@ -62,7 +63,7 @@ if __name__ == "__main__":
     input_tif = data_path + "/" + "input.tif"
 
     # convert to geopandas geodataframe
-    gdf = convert_tif_to_gdf(input_tif) 
+    gdf = convert_raster_to_gdf(input_tif) 
 
     # clip result geojson to project area
     gdf = geopandas.clip(gdf, get_project_area_as_gdf())
